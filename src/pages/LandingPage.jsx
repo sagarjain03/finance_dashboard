@@ -25,18 +25,7 @@ function LandingPage() {
         {/* Subtle Mono Backdrops instead of colored blobs */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[var(--text-primary)] opacity-5 rounded-full blur-[100px] -z-10 pointer-events-none transition-opacity"></div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--hover-bg)] border border-[var(--border-light)] text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-8"
-        >
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--text-primary)] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--text-primary)]"></span>
-          </span>
-          v2.0 Finance AI Engine
-        </motion.div>
+        
 
         <motion.h1
           initial={{ opacity: 0, scale: 0.98 }}

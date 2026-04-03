@@ -5,8 +5,26 @@ import { ROLES } from "../constants/roles";
 
 const AppContext = createContext();
 
+const LS_KEY = "transactions";
+
+/**
+ * Safely loads transactions from localStorage.
+ * Falls back to initialData if the key is missing, corrupted, or not an array.
+ */
+function loadTransactions() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return initialData;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : initialData;
+  } catch {
+    return initialData;
+  }
+}
+
 export function AppProvider({ children }) {
-  const [transactions, setTransactions] = useState(initialData);
+  // Lazy initializer: runs once on mount, reads from localStorage
+  const [transactions, setTransactions] = useState(loadTransactions);
   const [role, setRole] = useState(ROLES.VIEWER);
 
   // Theme Management — always default to dark for premium SaaS feel
@@ -16,6 +34,15 @@ export function AppProvider({ children }) {
     }
     return "dark";
   });
+
+  // ── Milestone 11: Persist transactions to localStorage on every change ──
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(transactions));
+    } catch {
+      // Silently ignore write errors (e.g. private-browsing storage limits)
+    }
+  }, [transactions]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -39,13 +66,28 @@ export function AppProvider({ children }) {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // ── Milestone 12: Update a transaction by id (immutable map) ──
+  const updateTransaction = (updatedTx) => {
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === updatedTx.id ? { ...t, ...updatedTx } : t))
+    );
+  };
+
+  /** Admin-only: clears localStorage and resets to initial mock data */
+  const resetData = () => {
+    localStorage.removeItem(LS_KEY);
+    setTransactions(initialData);
+  };
+
   return (
     <AppContext.Provider
       value={{
         transactions,
         setTransactions,
         addTransaction,
+        updateTransaction,
         deleteTransaction,
+        resetData,
         role,
         setRole,
         theme,
